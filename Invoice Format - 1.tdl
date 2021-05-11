@@ -1,0 +1,246 @@
+[#Form: Sales Color]
+	Add			: Option		: SSSPL_JSameo_INVPSales	: @@MainFormula_JSameo
+
+[!Form	: SSSPL_JSameo_INVPSales]
+	Delete		: Print
+	Add			: Print			: SSSPL_JSameo_INVP
+
+[Report	: SSSPL_JSameo_INVP]
+	Use		 	: VATNG Tringualtion Report_Variables 
+	Use			: GST InvoiceAnalysis Report_Variables
+    Use			: VATGCC InvAnalysis Report_Variables
+	Use         : STDInvoice
+	Form		: SSSPL_JSameo_INVP
+
+[Form	: SSSPL_JSameo_INVP]
+	Use         	: VATNG VATCSTAnalysis Variables
+  Parts       	: STDInvoiceTop, SSSPL_JSameo_INVPOpPgBrk
+	Bottom Part		: VCH GST AnalysisDetails
+	Option     		: GST InvoiceAnalysis
+	Width  			: @@InvWidth Inch
+	Height 			: @@InvHeight Inch
+    Space Top   	: @@InvSpace inch
+    Space Right 	: 0.5 inch
+    Space Left  	: @@InvSpaceLeft  inch
+    Space Bottom	: 0.25 inch
+	
+	
+    Page Break  	: SSSPL_JSameo_INVPClPgBrk, SSSPL_JSameo_INVPOpPgBrk
+	
+[Part	: SSSPL_JSameo_INVPClPgBrk]
+	Line		: SSSPL_JSameo_INVPClPgBrk
+	
+	[Line	: SSSPL_JSameo_INVPClPgBrk]
+		Field		: NameField
+		
+		Local	: Field	: NameField		: Info		: $$LocaleString:"Continue....."
+		
+[Part	: SSSPL_JSameo_INVPOpPgBrk]
+	Part	: SSSPL_JSameo_CMPDetails,Expinv Title Info Top,SSSPL_JSameo_BuyerSelle
+	Vertical: Yes
+	Local	: Part	: Expinv Title Info Top : Border	: Thin LeftRight
+[Part	: SSSPL_JSameo_CMPDetails]
+	Option	: SSSPL_JSameo_INVWithLogo 		: @@IsLogoEnabled 
+	Option	: SSSPL_JSameo_WithooutLogo		: Not @@IsLogoEnabled
+	Border	: Thin Box
+	
+[!Part	: SSSPL_JSameo_INVWithLogo]
+	Part	: SSSPL_JSameo_INVLogo,SSSPL_JSameo_INVCMPDetails
+	
+[!Part	: SSSPL_JSameo_WithooutLogo]
+Part	: SSSPL_JSameo_INVCMPDetails
+
+[Part	: SSSPL_JSameo_INVLogo]
+	Line		: EXPINVLogo
+	Graph Type	: ##SALogoPath 
+	Height		: 7% Page
+	Width		: 15% Page
+	Invisible	: If $$InPrintMode OR $$InMailAction OR ($$InExportMode And $$IsSysNameEqual:HTML:##SVExportFormat) then No Else Yes
+
+[Part	: SSSPL_JSameo_INVCMPDetails]
+	Line	: SSSPL_JSameo_CmpName,SSSPL_JSameo_CmpAdd,SSSPL_JSameo_CmpAlldeatils
+	;Repeat	: SSSPL_JSameo_CmpAdd	: SameoDiamCompanyAddress
+	Local	: Field	: NameField	: Full Width: Yes
+	
+	[Line	: SSSPL_JSameo_CmpName]
+		Field	: NameField
+		Local	: Field	: NameField	: Align	: Center
+		Local	: Field	: NameField	: Set as: @@CmpMailName
+		Local	: Field	: NameField	: Style	: Extra Large Bold
+		
+	[Line	: SSSPL_JSameo_CmpAdd]
+		Field	 : NameField
+		Local 	 : Field		: NameField		: Set as  : $$FullList:SameoDiamCompanyAddress:$Address	
+        Local 	 : Field		: NameField		: Style   : Normal
+		Local	 : Field		: NameField		: Align	  : Center
+		
+	[Line	: SSSPL_JSameo_CmpAlldeatils]
+		Field	 : NameField
+		Local 	 : Field		: NameField		: Set as  : @@CmpContacts+", "+@@CmpFaxNo+", "+@@CmpEmail
+        Local 	 : Field		: NameField		: Style   : Normal
+		Local	 : Field		: NameField		: Align	  : Center
+		
+[Collection: SameoDiamCompanyAddress]
+	
+    Type        : Address   : Company
+    Child of    : ##SVCurrentCompany
+	Compute		: IsNumber	  	: No
+	Compute		: FixedDirection: No 
+	
+[Part	: SSSPL_JSameo_BuyerSeller]
+	Part		: SSSPL_JSameo_Buyer, SSSPL_JSameo_Seller, SSSPL_JSameo_InvoiceDetails
+	Vertical	: No
+	Border		: thin Box
+	Local		: Part	: SSSPL_JSameo_Buyer	: Width	: 33% page
+	Local		: Part	: SSSPL_JSameo_Seller	: Width	: 38% page
+[Part	: SSSPL_JSameo_Buyer]
+	Line	: SSSPL_JSameoBuyTitle,SSSPL_JSameoBuyName,SSSPL_JSameoBuyAddress
+	Line	: SSSPL_JSameoBuyGSTIN,SSSPL_JSameoBuyPAN,SSSPL_JSameo_BuyState
+	Repeat	: SSSPL_JSameoBuyAddress	:  Address
+	Local	: Field	: default	: Style		: Small
+	Local	: Field	: NameField	: Width		: 33% page
+	
+	[Line	: SSSPL_JSameoBuyTitle]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $$LocaleString:"BILL TO"
+		
+	[Line	: SSSPL_JSameoBuyName]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $PartyName
+		Local	: Field	: NameField	: Style		: Small Bold
+	
+	[Line	: SSSPL_JSameoBuyAddress]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $Address
+		Local	: Field	: NameField	: Line		: 0
+		
+	[Line	: SSSPL_JSameoBuyGSTIN]
+		Field		: NameField
+		;Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"GSTIN"
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"GSTIN: "+$PartyGSTIN
+		
+	[Line	: SSSPL_JSameoBuyPAN]
+		Field		: NameField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"PAN No: "+$IncomeTaxNumber:ledger:$PartyLedgerName
+		
+	[Line	: SSSPL_JSameo_BuyState]
+		Field		: NameField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"State/ S.Code: "+$StateName+" / "+$$getGSTStateCode:$StateName
+		
+	
+[Part	: SSSPL_JSameo_Seller]
+	Border	: Thin Left
+	Line	: SSSPL_JSameoSellerTitle,SSSPL_JSameoSellerName,SSSPL_JSameoSellerAddress
+	Line	: SSSPL_JSameoSellerGSTIN,SSSPL_JSameoSellerPAN,SSSPL_JSameo_SellerState
+	Repeat	: SSSPL_JSameoSellerAddress	: BasicBuyerAddress
+	Local	: Field	: default			: Style		: Small
+	Local	: Field	: NameField			: Width		: 38% page
+	
+	[Line	: SSSPL_JSameoSellerTitle]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $$LocaleString:"SHIP TO"
+		
+	[Line	: SSSPL_JSameoSellerName]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $BasicBuyerName
+		Local	: Field	: NameField	: Style		: Small Bold
+		
+	[Line	: SSSPL_JSameoSellerAddress]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $BasicBuyerAddress
+		Local	: Field	: NameField	: Line		: 0
+		
+	[Line	: SSSPL_JSameoSellerGSTIN]
+		Field	: NameField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"GSTIN: "+$ConsigneeGSTIN
+	
+	[Line	: SSSPL_JSameoSellerPAN]
+		Field	: NameField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"PAN No: "+$IncomeTaxNumber:ledger:$PartyLedgerName
+		
+	[Line	: SSSPL_JSameo_SellerState]
+		Field		: NameField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"State/ S.Code: "+$ConsigneeStateName+" / "+$$getGSTStateCode:$ConsigneeStateName
+		
+[Part	: SSSPL_JSameo_InvoiceDetails]
+	Border		: thin Left
+	Part		: SSSPL_JSameo_INVData,SSSPL_JSameo_PurchaseOrder,SSSPL_JSameo_Dispatch
+	Vertical	: Yes
+		
+[Part	: SSSPL_JSameo_INVData]
+	Line	: SSSPL_JSameo_INVDataT,SSSPL_JSameo_INVDataNo,SSSPL_JSameo_INVDataDt
+	Local	: Field	: Default		: Style			: Small
+	Local	: Field	: NameField		: Full Width	: Yes
+	Local	: Field	: MediumPrompt	: Width			: 8
+	[Line	: SSSPL_JSameo_INVDataT]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $$LocaleString:"Tax Invoice"
+		
+	[Line	: SSSPL_JSameo_INVDataNo]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"No."
+		Local	: Field	: NameField		: Set as	: $VoucherNumber
+		
+	[Line	: SSSPL_JSameo_INVDataDt]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"Dt."
+		Local	: Field	: NameField		: Set as	: $$String:$date
+	
+[Part	: SSSPL_JSameo_PurchaseOrder]
+	Border	: Full Thin Top
+	Line	: SSSPL_JSameo_POT, SSSPL_JSameo_PONo, SSSPL_JSameo_PODue, SSSPL_JSameo_PODestination
+	Local	: Field	: Default		: Style			: Small
+	Local	: Field	: NameField		: Full Width	: Yes
+	Local	: Field	: MediumPrompt	: Width			: 20
+	Local	: Field	: SimpleField	: Full Width	: Yes
+
+	[Line	: SSSPL_JSameo_POT]
+		Field	: NameField
+		Local	: Field	: NameField	: Set as	: $$LocaleString:"Purchase Order"
+		
+	[Line	: SSSPL_JSameo_PONo]
+		Field		: NameField
+		Right Field	: SimpleField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"No.: "+$BasicPurchaseOrderNo
+		Local	: Field	: SimpleField	: Set as	: $$LocaleString:"Dt.: "+$$String:$BasicOrderDate
+		
+	[Line	: SSSPL_JSameo_PODue]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"Payment Terms/Due"
+		Local	: Field	: NameField		: Set as	: $BasicDueDateOfPymt
+		
+	[Line	: SSSPL_JSameo_PODestination]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"Destination"
+		Local	: Field	: NameField		: Set as	: $BasicFinalDestination
+		
+[Part	: SSSPL_JSameo_Dispatch]
+	Border	: Full Thin Top
+	Line	: SSSPL_JSameo_DisThroug, SSSPL_JSameo_DisLrNo, SSSPL_JSameo_DisEWill, SSSPL_JSameo_DisOtherRef
+	Local	: Field	: Default		: Style			: Small
+	Local	: Field	: NameField		: Full Width	: Yes
+	Local	: Field	: MediumPrompt	: Width			: 20
+	Local	: Field	: SimpleField	: Full Width	: Yes
+
+	[Line	: SSSPL_JSameo_DisThroug]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"Dispatched Through"
+		Local	: Field	: NameField		: Set as	: $BasicShippedBy
+		
+	[Line	: SSSPL_JSameo_DisLrNo]
+		Field		: NameField
+		Right Field	: SimpleField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"LR No.: "+$BillofLadingNo
+		Local	: Field	: SimpleField	: Set as	: $$LocaleString:"Dt.: "+$$String:$BillofLadingDate
+		
+	[Line	: SSSPL_JSameo_DisEWill]
+		Field		: NameField
+		Right Field	: SimpleField
+		Local	: Field	: NameField		: Set as	: $$LocaleString:"Ewaybill No.: "+@@GSTPrinteWayBillNumber
+		#Local	: Field	: SimpleField	: Set as	: $$LocaleString:"Dt.: "+$$String:$$GetGSTeWayBillDate
+		
+	[Line	: SSSPL_JSameo_DisOtherRef]
+		Field	: MediumPrompt, NameField
+		Local	: Field	: MediumPrompt	: Set as	: $$LocaleString:"Other Reference"
+		Local	: Field	: NameField		: Set as	: $BasicOrderRef
+	
