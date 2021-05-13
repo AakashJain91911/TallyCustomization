@@ -198,5 +198,4 @@ Default    :    ($$SysName:NotApplicable)
 
    
 [System :Formula]
-EBFIsOfSelectedVchNo:If (($$ExactMatch:##EBFVoucherNumberFrom:$$SysName:NotApplicable) OR ($$IsEmpty:##EBFVoucherNumberFrom)) AND (($$ExactMatch:##EBFVoucherNumberTo:$$SysName:NotApplicable) OR ($$IsEmpty:##EBFVoucherNumberTo)) Then yes else  +
-($$Number:$VoucherNumber >= $$Number:##EBFVoucherNumberFrom) AND ($$Number:$VoucherNumber <=$$Number:##EBFVoucherNumberTo)
+EBFIsOfSelectedVchNo: (($$ExactMatch:##EBFVoucherNumberFrom:$$SysName:NotApplicable) OR ($$IsEmpty:##EBFVoucherNumberFrom)) 
