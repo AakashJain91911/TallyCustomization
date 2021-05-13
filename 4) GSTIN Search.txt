@@ -1,0 +1,28 @@
+
+[#Menu     : GATE WAY OF taLLY]
+
+	Add : Top Button  : tinsearch,taxweb
+
+[Key: tinsearch]
+	
+	Title 	: "GSTIN Search" 
+	Key   	: Alt + T
+	Action	: Browse	: @@tinsearch
+	
+[key: taxweb]
+    	
+        title : "PAN or TIN to GSTIN"
+	Key   : Ctrl + T
+	Action : Browse : @@taxweb
+
+	
+
+	
+[System : Formula]
+	
+	tinsearch            : 	"https://services.gst.gov.in/services/searchtp"
+	taxweb		     :  "https://services.gst.gov.in/services/track-provisional-id-status"
+		
+
+
+	
