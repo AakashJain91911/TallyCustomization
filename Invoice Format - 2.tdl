@@ -1,0 +1,114 @@
+[#Form: Sales Color]
+	Add			: Option		: SSSPL_MKakaDiam_INVPSales	: @@MainFormula
+
+[!Form	: SSSPL_MKakaDiam_INVPSales]
+	Delete		: Print
+	Add			: Print			: SSSPL_MKakaDiam_INVP
+
+[Report	: SSSPL_MKakaDiam_INVP]
+	Use		 	: VATNG Tringualtion Report_Variables 
+	Use			: GST InvoiceAnalysis Report_Variables
+    Use			: VATGCC InvAnalysis Report_Variables
+	Use         : STDInvoice
+	Form		: SSSPL_MKakaDiam_INVP
+
+[Form	: SSSPL_MKakaDiam_INVP]
+	Use         	: VATNG VATCSTAnalysis Variables
+    Parts       	: STDInvoiceTop, SSSPL_MKakaDiam_INVPOpPgBrk,SSSPL_MKakaDiam_Details
+	Bottom Part		: SSSPL_MKakaDiam_INVEVBottomPartMain;,VCH GST Analysis, SSSPL_MIRS_BottomPart
+	Option     		: GST InvoiceAnalysis
+	Width  			: @@InvWidth Inch
+	Height 			: @@InvHeight Inch
+    Space Top   	: @@InvSpace inch
+    Space Right 	: 0.5 inch
+    Space Left  	: @@InvSpaceLeft  inch
+    Space Bottom	: 0.25 inch
+	
+	
+    Page Break  	: SSSPL_MKakaDiam_INVPClPgBrk, SSSPL_MKakaDiam_INVPOpPgBrk
+	;Local	: Part	: VCH GST Analysis	: Replace: Part	: VCH GST AnalysisAmtDetails : SSSPL_MIRS_BottomTopPart
+	
+[Part	: SSSPL_MKakaDiam_INVPClPgBrk]
+	Line		: SSSPL_MKakaDiam_INVPClPgBrk
+	
+	[Line	: SSSPL_MKakaDiam_INVPClPgBrk]
+		Field		: NameField
+		
+		Local	: Field	: NameField		: Info		: $$LocaleString:"Continue....."
+		
+[Part	: SSSPL_MKakaDiam_INVPOpPgBrk]
+	Part	: Expinv Title Info Top,SSSPL_MKakaDiam_INVMainPart,SSSPL_MKakaDiam_BuyerSeller,SSSPL_MKakaDiam_ColoumTitle;, SSSPL_MKakaDiam_INVPaymnet,SSSPL_MKakaDiam_INVColoumData
+	Vertical: Yes
+
+[Part	: SSSPL_MKakaDiam_INVMainPart]
+	Option	: SSSPL_MKakaDiam_INVWithLogo 		: @@IsLogoEnabled ;And $$IsEmpty:$ATSIRNInvNo 
+	;Option	: SSSPL_MKakaDiam_INVWithLogoQR 	: @@IsLogoEnabled ;And Not $$IsEmpty:$ATSIRNInvNo 
+	;Option	: SSSPL_MKakaDiam_CMPDetailsWitQR	: Not @@IsLogoEnabled; And Not $$IsEmpty:$ATSIRNInvNo 
+	Option	: SSSPL_MKakadiam_WithooutLogo		: Not @@IsLogoEnabled ;And $$IsEmpty:$ATSIRNInvNo
+	Border	: Thin Box
+	
+[!Part	: SSSPL_MKakadiam_WithooutLogo]
+	Part		: SSSPL_MKakaDiam_CMPDetails,SSSPL_MKakaDiam_InvDetails
+	Vertical	: No
+	;Local	: Part	:  SSSPL_MKakaDiam_CMPDetails	: Width	: 50% page
+[!Part	: SSSPL_MKakaDiam_INVWithLogo]
+	Part		: SSSPL_MKakaDiam_INVLogo, SSSPL_MKakaDiam_CMPDetails,SSSPL_MKakaDiam_InvDetails
+	Vertical	: No
+		
+	Local		: Part	: SSSPL_MKakaDiam_InvDetails	: Width		: 40% Page
+	Local		: Part	: SSSPL_MKakaDiam_CMPDetails	: Width		: 40% page
+	Local		: Part	: SSSPL_MKakaDiam_INVLogo		: Width		: 20% page
+	
+[Part	: SSSPL_MKakaDiam_INVLogo]
+	Line		: EXPINVLogo
+	Graph Type	: ##SALogoPath 
+	;Space Top	: 2
+	Height		: If ((NOT $$InPrintMode) AND ($$InExportAction OR $$InMailAction)) Then 15% Else 10% Page
+	Width		: 15% Page
+	;Invisible	: If $$InPrintMode OR $$InMailAction OR ($$InExportMode And $$IsSysNameEqual:HTML:##SVExportFormat) then No Else Yes
+[Part	: 		SSSPL_MKakaDiam_CMPDetails]
+	Line	: SSSPL_MKakaDiam_CmpName,SSSPL_MKakaDiam_CmpAdd,SSSPL_MKakaDiam_Phonenumber,SSSPL_MKakaDiam_GstDet,SSSPL_MKakaDiam_StateCode;SSSPL_MKakaDiam_Phonenumber,SSSPL_MKakaDiam_Email,SSSPL_MKakaDiam_GstDet
+	Repeat	: SSSPL_MKakaDiam_CmpAdd	: KakaDiamCompanyAddress
+	;Width	: 40% page
+	Local	: Field	: NameField	: Full Width: Yes
+	[Line	: SSSPL_MKakaDiam_CmpName]
+		Field	: Name Field
+		Local	: Field	: Name Field	: Set as		: @@CmpMailName
+		Local	: Field	: Name Field	: Full Width	: Yes
+		Local	: Field	: Name Field	: Align			: Left
+		Local	: Field	: Name Field	: Style			: Normal Bold
+		
+	[Line	: SSSPL_MKakaDiam_CmpAdd]
+		Field    : Name Field
+        Local 	 : Field		: NameField		: Set as  : $Address	
+        Local 	 : Field		: NameField		: Style   : Normal	
+		Local	 : Field		: NameField		: Line	  : 0
+		
+	[Line	: SSSPL_MKakaDiam_Phonenumber]
+		Field	: Name Field
+		
+		Local	: Field	: Name Field	: Set as		: @@CmpContacts
+		Local	: Field	: Name Field	: Full Width	: Yes
+		Local	: Field	: Name Field	: Align			: Left
+		Local	: Field	: Name Field	: Style			: Normal
+	[Line	: SSSPL_MKakaDiam_GstDet]
+		Field    	: MediumPrompt, Name Field
+		Field		: ShortPrompt, SimpleField
+		Local	: Field	: MediumPrompt	: Set as : $$LocaleString:"GSTIN"
+		Local	: Field	: MediumPrompt	: Width	 : 10
+		Local	: Field	: ShortPrompt	: Set as : $$LocaleString:"PAN"
+		Local	: Field	: ShortPrompt	: Width	 : 7
+		Local	: Field	: ShortPrompt	: Style	 : Normal Bold
+		Local	: Field	: MediumPrompt	: Style	 : Normal Bold
+        Local 	: Field	: NameField		: Set as : @@CMPGSTaxNumber
+        Local 	: Field	: NameField		: Style  : Normal	
+		Local	: Field	: SimpleField	: set as : $IncomeTaxNumber:Company:##SVCurrentCompany 
+		Local	: Field	: SimpleField	: Full Width: Yes
+		
+	[Line	: SSSPL_MKakaDiam_StateCode]
+		Field    	: MediumPrompt, Name Field
+		Local	: Field	: MediumPrompt	: Set as : $$LocaleString:"State Code"
+		;Local	: Field	: MediumPrompt	: Width	 : 15
+		Local	: Field	: MediumPrompt	: Style	 : Normal Bold
+        Local 	: Field	: NameField		: Set as : $$getGSTStateCode:$stateName:Company:##SvCurrentCompany
+        Local 	: Field	: NameField		: Style  : Normal
