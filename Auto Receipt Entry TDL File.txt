@@ -1,0 +1,185 @@
+;**********************************************************;
+;*********************================*********************;
+;*********************| AJ Software  |*********************;
+;*********************================*********************;
+;**********************************************************;
+
+[Report: VchReceiptInfo]
+
+    Forms                : Vch Receipt Info
+
+[Form: VchReceiptInfo]
+
+    Top Parts            : Vch Receipt Info
+    On                   : Form Accept         : Yes    : Form Accept
+    On                   : Form Accept         : Yes    : CALL : ReceiptVchCreate
+
+[Part: VchReceiptInfo]
+
+    Top Lines            : VCH Receiptdr,Vch Receipt Info,  VCH Receiptdr2,Vch Receipt Info2 ,VCH Chequeno,VCH BankDate
+    Local                : Line : Default : Space top : 1
+
+[#Part: DBLLINE Narration]
+
+    Add                  : Line : Before : Vch Narrprompt : VCH ReceiptPass
+
+[Line: VCH ReceiptPass]
+
+    Left Fields          : Medium Prompt,VCH ReceiptPass
+    Local                : Field : Medium Prompt : Set as :"Pass Receipt Entry : "
+    Invisible            : not @@issales
+
+[Line: VchReceiptdr]
+
+    Left Fields          : Medium Prompt,Name Field
+    Local                : Field : Medium Prompt : Set as :"Cash Account :"
+    Local                : Field : Name Field :  Table       : Cash Class Ledgers ExtractCash : $$IsEmpty:@VchLed
+    Local                : Field : Name Field :  Storage:VchReceiptdr
+    Local                : Field : Name Field : Show Table : Always
+
+[Line: VchReceiptdr2]
+
+    Left Fields          : Medium Prompt,Name Field
+    Local                : Field : Medium Prompt : Set as :"Bank Account :"
+    Local                : Field : Name Field :  Table       : Cash Class Ledgers Extract Bank: $$IsEmpty:@VchLed
+    Local                : Field : Name Field :  Storage:VchReceiptdr2
+    Local                : Field : Name Field : Show Table : Always
+
+[Line: VchReceiptInfo]
+
+    Left Fields          : Medium Prompt,Vch Receipt Info
+    Local                : Field : Medium Prompt : Set as :"Receipt Amount :"
+
+[Line: VchReceiptInfo2]
+
+    Left Fields          : Medium Prompt,Vch Receipt Info2
+    Local                : Field : Medium Prompt : Set as :"Receipt Amount :"
+
+[Line: VCHChequeno]
+
+    Left Fields          : Medium Prompt,VCH Chequeno
+    Local                : Field : Medium Prompt : Set as :"Cheque no :"
+
+[Line: VCHBankDate]
+
+    Left Fields          : Medium Prompt,VCH BankDate
+    Local                : Field : Medium Prompt : Set as :"Cheque Date :"
+
+[Field: VCH ReceiptPass]
+
+    Use                  : Logical Field
+    Storage              : VCHReceiptPass
+    Set Always           : Yes
+    Show Table           : always
+    Sub Forms            : Vch Receipt Info :$$Value
+
+[Field: VchReceiptInfo]
+
+    Use                  : Amount Field
+    Storage              : VchReceiptInfo
+
+[Field: VchReceiptInfo2]
+
+    Use                  : Amount Field
+    Storage              : VchReceiptInfo2
+
+[Field: VCHChequeno]
+
+    Use                  : Name Field
+    Storage              : VCHChequeno
+
+[Field: VCHBankDate]
+
+    Use                  : Short Date Field
+    Storage              : VCHBankDate
+
+[Collection: Cash Class Ledgers ExtractCash]
+
+    Use                  : Extract Alias Collection
+    Source Collection    : LedgersVch Src
+    Collections          : Notapplicable
+    Title                : $$LocaleString:"List of Ledger Accounts"
+    Parm Var             : GroupCash    : String : $$GroupCash
+    Native Method        : Name, Parent, ReserveName
+    Keep Source          : ().
+    Client Only          : Yes
+    Filters              : IsCashAccountVchRE, ClassFilter
+
+[Collection: Cash Class Ledgers ExtractBank]
+
+    Use                  : Extract Alias Collection
+    Source Collection    : LedgersVch Src
+    Collections          : Notapplicable
+    Title                : $$LocaleString:"List of Ledger Accounts"
+    Parm Var             : GroupBank    : String : $$GroupBank
+    Parm Var             : GroupBankOD   : String : $$GroupBankOD
+    Native Method        : Name, Parent, ReserveName
+    Keep Source          : ().
+    Client Only          : Yes
+    Filters              : IsBankAccountVchRE, ClassFilter
+
+[Function: ReceiptVchCreate]
+
+    Action               : 01  : QUERYBOX : "Create Receipt Voucher ?":Yes:No
+    Action               : 02 : IF : $$LastResult
+    Action               : 03 : NEW OBJECT : VOUCHER
+    Action               : 04 :   SET VALUE : Date      : $date
+    Action               : 05 :   SET VALUE : VoucherTypeName   : $$VchTypeReceipt
+    Action               : 06  :  SET VALUE  : Narration     : $Narration
+    Action               : 08 :   INSERT COLLECTION OBJECT    : AllLedgerEntries
+    Action               : 09 : SET VALUE  : LedgerName   : $Partyledgername
+    Action               : 10 :  SET VALUE  : Is Deemed Positive : "no"
+    Action               : 11 :  SET VALUE  : Amount     : ($VchReceiptInfo+$VchReceiptInfo2)   ;;($VchReceiptInfo+$VchReceiptInfo2)   ;;$Amount
+    Action               : 12 :    INSERT COLLECTION OBJECT    : BillAllocations
+    Action               : 13 :   SET VALUE   : BillType    : $$SysName:Advance
+    Action               : 14 :     SET VALUE  : Name     : $vouchernumber
+    Action               : 15 :    SET VALUE  : Amount                :($VchReceiptInfo+$VchReceiptInfo2)  ;($VchReceiptInfo+$VchReceiptInfo2)   ;;$amount
+    Action               : 16 :    SET TARGET  : ...
+    Action               : 17 :   INSERT COLLECTION OBJECT    : AllLedgerEntries
+    Action               : 18 :  SET VALUE  : LedgerName   : $VchReceiptdr
+    Action               : 19 :   SET VALUE  : Amount    : $VchReceiptInfo
+    Action               : 20 :   SET VALUE  : Is Deemed Positive : "yes"
+    Action               : 21 :   SET TARGET  : ..
+    Action               : 17a :   INSERT COLLECTION OBJECT    : AllLedgerEntries
+    Action               : 18a :  SET VALUE  : LedgerName   : $VchReceiptdr2
+    Action               : 19b :   SET VALUE  : Amount    : $VchReceiptInfo2
+    Action               : 20c :   SET VALUE  : Is Deemed Positive : "yes"
+    Action               : 0060 :  INSERT COLLECTION OBJECT : BankAllocations
+	Action				 : 0061	: SET TARGET		: BANKALLOCATIONS
+    Action               : 0070 :  SET VALUE    : Date     : $VCHBankDate
+    Action               : 0080 :  SET VALUE    : InstrumentDate  : $VCHBankDate
+    Action               : 0090 :  SET VALUE    : InstrumentNumber  : $VCHChequeno
+	Action				 : 0091 : Set Value		: Name				: $$MakeUniqueID				 
+
+	Action				 : 0092 :  SET VALUE	: PAYMENTMODE	: "Transacted"
+    Action               : 0100 :  SET VALUE    : PaymentFavouring  : $partyledgername
+    Action               : 0110 :  SET VALUE    : TransactionType  :  $$Sysname:ChequeDD
+    Action               : 0120 :  SET VALUE    : UniqueReferenceNumber : $VCHChequeno
+    Action               : 0140 :  SET VALUE    : ChequeCrossComment : $$LocaleString:"A/c Payee"
+    Action               : 0150 :  SET VALUE    : Amount    : $VchReceiptInfo2 * -1
+    Action               : 0160 : Set Target     : ..
+    Action               : 22  :   SET VALUE       : PersistedView  : ##SVViewName
+    Action               : 23 :  CREATE TARGET
+    Action               : 24 :  ENDIF
+	
+
+[#System: Formulae]
+
+    IsCashAccountVchRE   : $ReserveName = ##GroupCash
+    IsBankAccountVchRE   : $ReserveName = ##GroupBank OR $ReserveName = ##GroupBankOD
+
+[System: UDF]
+
+    VCH ReceiptPass      : Logical:902:yes
+    VchReceiptdr         : String:901:yes
+    VchReceiptdr2        : string:913:yes
+    VchReceiptInfo       : Amount:903:yes
+    VchReceiptInfo2      : Amount:904:yes
+    VCHChequeno          : String:905:yes
+    VCHBankDate          : Date:906:yes
+
+;**********************************************************;
+;*********************================*********************;
+;*********************| Vky Malik |*********************;
+;*********************================*********************;
+;**********************************************************;
