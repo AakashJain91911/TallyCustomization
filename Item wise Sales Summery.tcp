@@ -1,0 +1,202 @@
+[#Menu : Gateway of Tally]
+Item : Item Wise Sales Summary  : Display : My_Sales_Summary
+
+[Report :My_Sales_Summary]
+Form :My_Sales_Summary
+Variable : SVFromDate,SVToDate
+Set : SVFromDate : $$CurrentDate
+Set : SVToDate : $$CurrentDate
+
+Variable : EBFVoucherNumberFrom,EBFVoucherNumberTo
+Set    :    EBFVoucherNumberFrom    :    $$SysName:NotApplicable
+Set    :    EBFVoucherNumberTo        :    $$SysName:NotApplicable
+
+[Form :My_Sales_Summary]
+Part : DSP AccTitles,MyReportTitle,My_Sales_SummaryTL,My_Sales_Summary
+Page Break : DSP ClPageBreak, CyDSPOpPageBreak
+Full Width : No
+Space Top : If $$InPrintMode Then 0.2 Else 0 inches
+Space Bottom : If $$InPrintMode Then 0.25 Else 0 inches
+Space Left : If $$InPrintMode Then 0.25 Else 0 inches
+Space Right : If $$InPrintMode Then 0.25 Else 0 inches
+Button : F2Change Period,EBFIsOfSelectedVchNo
+Bottom Buttons : BlankButton, InvReports, AcctReports, Report Operations, DYBKConfigure, FilterButton, ValueButton
+Bottom Toolbar Buttons : BottomToolBarBtn1, BottomToolBarBtn6, BottomToolBarBtn7, BottomToolBarBtn8, BottomToolBarBtn9, BottomToolBarBtn10, BottomToolBarBtn11, BottomToolBarBtn12
+Buttons : PrintButton, ExportButton, UploadButton, MailButton
+Background : @@SV_UNYELLOW
+
+[Part : CyDSPOpPageBreak]
+Parts : DSP OpCompanyName,DSP Op ReportTitle,My_Sales_SummaryTL
+Vertical: Yes
+
+[Part : MyReportTitle]
+Line :MyReportTitle
+
+[Line :MyReportTitle]
+Field : Simple Field
+Local : Field : Simple Field : Set As : "Item Wise Sales Summary from -  " + $$String:##SVFromDate +" to " + $$String:##SVToDate
+Local : Field : Simple Field : Style : Normal Bold
+
+[Part : My_Sales_SummaryTL]
+Line : My_Sales_SummaryTL
+Border : Column Titles
+
+[Line : My_Sales_SummaryTL]
+Use : My_Sales_Summary
+Local : Field : Default : Type : string
+Local : Field : My_Sales_SummaryItem : Set As : "Particulars"
+Local : Field : MyItemsSalesQty: Set As : "Sales Qty"
+Local : Field : MyItemsSalesRate : Set As : "Rate"
+Local : Field : MyItemsSalesAmount : Set As : "Sales Value"
+Local :Field : Default : Style : Small Bold
+
+[Part :My_Sales_Summary]
+Lines : My_Sales_Summary
+BottomLines:My_Sales_SummaryTotal
+Repeat : My_Sales_Summary :MySalesItems
+Scroll : Vertical
+Float : Yes
+Total : MyItemsSalesQty,MyItemsSalesAmount
+CommonBorder : Yes
+
+[Line :My_Sales_Summary]
+Field : My_Sales_SummaryItem
+Right Field : MyItemsSalesQty,MyItemsSalesRate,MyItemsSalesAmount
+Border : Thin bottom
+
+[Field : My_Sales_SummaryItem]
+Set As : $Stockitem
+Width : 40% Screen
+Style : Normal
+Display : Item Monthly Summary
+Variable : StockitemName
+Border : Thin Left
+
+[Field : MyItemsSalesQty]
+Use : Qty Primary Field
+Style : Normal
+Set As : $ActualQty
+Border : Thin Left
+Width : 10
+
+[Field : MyItemsSalesRate]
+Use : Rate Price Field
+Set as : $Rate
+Style : Normal
+Border : Thin Left
+Width : 10
+
+[Field : MyItemsSalesAmount]
+Use     : Amount Field
+Set As     : $Amount
+Style     : Normal
+Border     : Thin Left Right
+
+[Line : My_Sales_SummaryTotal]
+Use   : My_Sales_Summary
+Local : Field : My_Sales_SummaryItem : Set As : "Total"
+Local : Field : MyItemsSalesQty        : Set As : $$Total:MyItemsSalesQty
+Local : Field : MyItemsSalesAmount     : Set As : $$Total:MyItemsSalesAmount
+Local : Field : Default : Style : Small Bold
+Border: Thin Top Bottom
+
+[Collection 	: MySalesSummaryCollection]
+Title    		:    "List of Sales vouchers"
+Type     		: Vouchers : VoucherType
+Child of		: $$VchTypeSales
+Belongs to 		: Yes
+Format    		:    $VoucherNumber, 20
+Fetch    		:    VoucherNumber
+Fetch     		: Inventory Entries
+Filter 			: EBFIsOfSelectedVchNo
+Sort    		:    @@InvoiceNumberIncr    :    $VoucherNumber
+
+[Collection : MySalesItems]
+
+Source Collection : MySalesSummaryCollection
+Walk : Inventory Entries
+By : StockItemName 		: $StockItemName
+Sort : StockItemName 	: $StockItemName
+Aggr Compute 	: ActualQty : Sum : $ActualQty
+Aggr Compute 	: Rate : Sum : $Rate
+Aggr Compute 	: Amount : Sum : $Amount
+Keep Source 	: ().
+
+[Button : EBFIsOfSelectedVchNo]
+Key : Alt+V
+Title : Selected Vch No
+Action : Alter:EBFIsOfSelectedVchNo
+
+[Report: EBFIsOfSelectedVchNo]
+Form : EBFIsOfSelectedVchNo
+
+[Form : EBFIsOfSelectedVchNo]
+Part : SelectedVchNoHead,EBFIsOfSelectedVchNo
+Width : 30% page
+
+[Part : SelectedVchNoHead]
+Line : SelectedVchNoPart1
+Space Bottom :0.20 cm
+
+[Line: SelectedVchNoPart1]
+Fields : Name Field
+Local : Field: Name Field : Info	: "Voucher Filter"
+Local : Field: Name Field : Style 	: SelectedVchNoStyle
+Local : Field: Name Field : Border 	: Double Bottom
+Local : Field: Name Field : Align 	: Center
+Local : Field: Name Field : Full Width : Yes
+
+[Style: SelectedVchNoStyle]
+
+Use : Normal Bold
+Height : 12
+Italic : Yes
+
+[Part : EBFIsOfSelectedVchNo]
+Line : EBFVoucherNumberFrom,EBFVoucherNumberTo
+
+[Line : EBFVoucherNumberFrom]
+
+Field : Medium Prompt,EBFVoucherNumberFrom
+Local : Field : MediumPrompt :Info : "Voucher No.From:"
+
+
+[Field : EBFVoucherNumberFrom]
+Use : Name Field
+Modifies : EBFVoucherNumberFrom
+Table    :    MySalesSummaryCollection, Not Applicable
+Show Table    :    Default
+
+[Line : EBFVoucherNumberTo]
+Field : MediumPrompt,EBFVoucherNumberTo
+Local : Field : MediumPrompt :Info : "Voucher No.To:"
+
+[Field :EBFVoucherNumberTo]
+Use : Name Field
+Modifies : EBFVoucherNumberTo
+Set always : Yes
+Table    :    MySalesSummaryCollection, Not Applicable
+Show Table    :    Default
+
+		
+[System : Variable]
+
+EBFVoucherNumberFrom     : ($$SysName:NotApplicable)
+EBFVoucherNumberTo         : ($$SysName:NotApplicable)
+
+[Variable : EBFVoucherNumberFrom]
+
+Type : String
+volatile : Yes
+Default    :    ($$SysName:NotApplicable)
+
+[Variable :EBFVoucherNumberTo]
+
+Type : String
+Volatile : Yes
+Default    :    ($$SysName:NotApplicable)
+
+   
+[System :Formula]
+EBFIsOfSelectedVchNo:If (($$ExactMatch:##EBFVoucherNumberFrom:$$SysName:NotApplicable) OR ($$IsEmpty:##EBFVoucherNumberFrom)) AND (($$ExactMatch:##EBFVoucherNumberTo:$$SysName:NotApplicable) OR ($$IsEmpty:##EBFVoucherNumberTo)) Then yes else  +
+($$Number:$VoucherNumber >= $$Number:##EBFVoucherNumberFrom) AND ($$Number:$VoucherNumber <=$$Number:##EBFVoucherNumberTo)
