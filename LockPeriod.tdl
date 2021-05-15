@@ -1,0 +1,137 @@
+; AJ Software Solutions
+
+[System: UDF]
+	GWLWstartDate		: Date    : 40
+	GWLWEndDate 		: Date    : 41
+	GWLWlock			: String  : 42
+	
+
+[#Menu: Gateway of Tally]
+	Add : top Button : BtnDtLock
+	
+	[Button: BtnDtLock]
+		Title  : "Date Open"
+		Key    : Ctrl+Enter
+		Action : Alter : DateOpenPeriod
+
+[Report : DateOpenPeriod]
+Title  : "Date Open Period" 
+    Form   : DatelockFunction1
+    Object : Company
+
+    [Form : DatelockFunction1]
+        Part    		: DateLockfunctionTitle, Datelockfunctio
+		Width   		: 50% Screen
+
+        [Part : DateLockfunctionTitle]
+            Line    : DateLockfunctionTitle
+	
+					
+            [Line : DateLockfunctionTitle]
+                Fields : Name Field
+				Local : Field : Name Field : Full Width : Yes
+				Local : Field : Name Field : Align 		: Centre
+                Local : Field : Name Field : Skip   	: Yes
+				Local : Field : Name Field : Set As   	: "Date Open Between"
+				Space top : 1
+				Space Bottom : 1
+
+        [Part : Datelockfunction]
+            Line    : Datelockfunction2 
+			
+					             
+
+            [Line : Datelockfunction2]
+                Fields : Long Prompt, Openingstartdate, Short Prompt, OpeningEnddate
+				Local : Field : Long Prompt : Info : "Allow Entry/Modifications only for the Period From:" 
+				Local : Field : Short Prompt  : Info : "To:" 
+				Local : Field : Long Prompt   : Width : 50
+				Local : Field : Short Prompt  : Width : 5
+				Space Bottom : 1.5
+				
+				[Field : Openingstartdate]
+					Use     : Short date field
+					Set as  : $GWLWstartDate
+					Storage : GWLWstartDate
+
+				[Field : OpeningEnddate]
+					Use     : Short date field
+					Set as  : $GWLWEndDate
+					Storage : GWLWEndDate
+
+
+[System : Formula]
+	smsstartdate 		: $GWLWstartDate:Company:##SVCurrentCompany
+	smsenddate   		: $GWLWEndDate:Company:##SVCurrentCompany
+	Control1	: "Period is closed !"+$$NewLine+"Creation is not allowed."
+	Control2		: "Period is closed !"+$$NewLine+"Alteration is not allowed."
+	
+	Control3	: "Period is closed !"+$$NewLine+"Deletion is not allowed."
+	Control4	: "Date not allowed !"+$$NewLine+"Open period is between" + $$Newline + $$String:@@smsstartdate + " and " + $$String:@@smsenddate
+
+	GWLWDateisopen	: $Date >= $GWLWstartDate:Company:##SVCurrentCompany AND $Date <= $GWLWEndDate:Company:##SVCurrentCompany 
+	GWLWEffDateisopen		: $EffectiveDate >= $GWLWstartDate:Company:##SVCurrentCompany AND $EffectiveDate <= $GWLWEndDate:Company:##SVCurrentCompany 
+
+
+	GWLWVchcreation	: $$InCreateMode AND NOT @@GWLWDateisopen
+	GWLWVchAlteration		: $$InAlterMode AND (NOT @@GWLWDateisopen OR NOT @@GWLWEffDateisopen)
+	OpBalLock               : $GWLWlock:Company:##SVCurrentCompany = "Yes"
+
+
+[#Key   : Delete Line Object]
+	 Inactive	:  Not @@GWLWDateisopen 
+
+[#Key: Cancel Line Object]
+	Inactive	:   Not @@GWLWDateisopen
+
+
+
+[#Key   : Form Delete]
+	Inactive	: (NOT $$CanDelete) OR (NOT @@GWLWDateisopen)
+
+[#Key	: Form Cancel]
+	Inactive	: (NOT $$CanCancel) OR (NOT @@GWLWDateisopen)
+
+ 
+[#Form: Voucher]
+	Local	: Key 	: Form Delete		 : Inactive	: NOT @@GWLWDateisopen
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Form Cancel		 : Inactive : NOT @@GWLWDateisopen
+	Add : Control   : TUtil16_Control1 : NOT ($$Value >= $GWLWstartDate:Company:##SVCurrentCompany AND $$Value <= $GWLWEndDate:Company:##SVCurrentCompany )
+	Add : Control	: Control2	: @@GWLWVchAlteration
+
+
+[#Field: Chg SVDate]
+	Add : Control     : Control4 : NOT ($$Value >= $GWLWstartDate:Company:##SVCurrentCompany AND $$Value <= $GWLWEndDate:Company:##SVCurrentCompany )
+
+;[#Field: Chg VchDate]
+;	Add : Control     : Control1 : NOT ($$Value >= $GWLWstartDate:Company:##SVCurrentCompany AND $$Value <= $GWLWEndDate:Company:##SVCurrentCompany )
+
+
+[#Field: Plain VCH Date]
+	Add : Control     : Control4 : NOT ($$Value >= $GWLWstartDate:Company:##SVCurrentCompany AND $$Value <= $GWLWEndDate:Company:##SVCurrentCompany )
+	
+;;[#Key: PrintButton]
+;;	Inactive	: If $$IsVoucher AND $$InCreateMode Then Yes else No
+
+[#Line: DSP VchDetail]
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Cancel Line Object : Inactive : NOT @@GWLWDateisopen
+
+
+[#Line: STKVCH NormalDetail]
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Cancel Line Object : Inactive : NOT @@GWLWDateisopen
+
+[#Line: STKVCH InTRACKLead]
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Cancel Line Object : Inactive : NOT @@GWLWDateisopen
+
+
+[#Line: STKVCH OutTRACKLead]
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Delete Line Object : Inactive : NOT @@GWLWDateisopen
+	Local   : Key   : Cancel Line Object : Inactive : NOT @@GWLWDateisopen
+	
+	
+; AJ Software Solutions
