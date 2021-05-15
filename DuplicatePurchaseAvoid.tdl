@@ -1,0 +1,28 @@
+; AJ Software Solutions
+;; Duplicate Avoid for Purchase Vourchers
+
+[#Field: Vch Ref]
+    On:Accept:Yes:Field Accept
+    On:Accept:Yes:Call:Refreshtdls
+
+[Function:Refreshtdls]
+01 : Refresh TDL
+
+[#Field : EiConsignee]
+ Control : IsTitle : IF $$IsPurchase:$VoucherTypeName And ($$InCreatemode OR $$InDuplicateMode) Then @@ChkVal Else ""
+ Set Always :Yes
+[Collection : VchrefColl]
+
+ Type : Voucher
+ Fetch : VoucherNumber , Reference,Ledgername
+ Filter : FltVal
+ Filter : FltValJK
+
+[System : Formulas]
+
+ IsTitle : "ERROR !!"+$$NewLine+$$NewLine+"Duplicate Reference No."+$$NewLine+$$NewLine+"Already Entered this Invoice Number, Please Check Invoice No."+$$NewLine+$$NewLine+$$NewLine+$$NewLine+$$NewLine+"Subscribe our Youtube Channel SmarterDay2Day for Regular Update"
+
+ ChkVal : NOT $$ISEMPTY:$Reference And $PartyLedgerName =#EiConsignee AND $$NumItems:VchrefColl > 0
+
+ FltVal : $Reference = #VchRef
+ FltValJK:$LedgerName = #EiConsignee
