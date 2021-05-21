@@ -1,0 +1,497 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+;;--------------------------------------------------------------------------------------------
+;;TdlType : Print User Name in All the Default Reports And Vouchers
+;;Notes : Set "Print Company User Name " To Yes in F11 Features to Activate this features
+;;-------- Changes in F11 --> Accounting features--------
+[#Part: CMP AccFeat Right]
+
+	Add : Lines : At End : CMP UsrName
+
+	[Line: CMP UsrName]
+
+		Fields 	: Medium Prompt, CMP UsrNameFld
+		Local 	: Field : Medium Prompt : Info : "Print Company User Name ?"
+
+		Invisible : NOT $IsSecurityOn
+		Space Top : 0.4
+
+		[Field: CMP UsrNameFld]
+
+			Use 		: Logical Field
+			Type 		: Logical:Forced
+			Storage 	: IsUserPrintOn
+			Set always 	: Yes
+
+;;----------------------------------ADDED PART AT THE END OF EVERY REPORT------------------------------------------
+
+[Part: CmpUserNamePart]
+
+	Line 	: CmpUserNameLine
+	
+	[Line: CmpUserNameLine]
+
+		Field : Short Prompt, Name Field
+
+		Local : Field : Short Prompt : Info 		: "User Name"
+		Local : Field : Short Prompt : Invisible	: NOT $$InPrintMode
+		Local : Field : Short Prompt : Inactive 	: If @@checkUser OR NOT @@IsCmpUserOn Then Yes Else No
+		Local : Field : Name Field 	 : Set As 		: $$CmpUserName
+		Local : Field : Name Field 	 : Invisible	: NOT $$InPrintMode
+		Local : Field : Name Field 	 : Inactive 	: If @@checkUser OR NOT @@IsCmpUserOn Then Yes Else No
+		Local : Field : Default		 : Style 		: Normal Bold Italic
+
+;;----------------------------------Trial Balance----------------------------------------------------------
+
+[#Report: Trial Balance]
+
+	Local : Form : Group Summary : Add : Part : At End : CmpUserNamePart
+
+;;----------------------------------Day Book----------------------------------------------------------
+
+[#Report: Day Book]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+;;------------------------Accounts Books Reports------------------------------------------------
+[#Report: Bank Group Summary]
+
+	Local : Form : Group Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ledger Vouchers]
+
+	Local : Form : Ledger Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Summary]
+
+	Local : Form : Group Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Vouchers]
+
+	Local : Form : Group Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Sales Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Voucher Register]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Purchase Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Journal Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Debit Note Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Credit Note Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+
+;;------------------------------Cost Centre Reports-------------------------------------------------
+
+
+[#Report: Cost Category Summary]
+
+	Local : Form : Cost Category Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Cost Centre Summary]
+
+	Local : Form : Cost Centre Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: CC Monthly Summary]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: CC Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: CC Vouchers]
+
+	Local : Form : CC Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Cost Centre BreakUp]
+
+	Local : Form : Group Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ledger Monthly Summary]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ledger Cost Breakup]
+
+	Local : Form : Cost Category Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Cost Breakup]
+
+	Local : Form : Cost Category Summary : Add : Part : At End : CmpUserNamePart
+
+;;--------------------------------------OutStanding------------------------------------------------
+[#Report: Bills Receivable]
+
+	Local : Form : Bills Outstanding : Add : Part : At End : CmpUserNamePart
+
+[#Report: Bills Payable]
+
+	Local : Form : Bills Outstanding : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ledger Outstandings]
+
+	Local : Form : Ledger Outstandings : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Outstandings]
+
+	Local : Form : Group Outstandings : Add : Part : At End : CmpUserNamePart
+
+;;------------------------Inventory Books Reports-------------------------------------------------
+[#Report: Item Monthly Summary]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Vouchers]
+
+	Local : Form : Stock Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Summary]
+
+	Local : Form : Stock Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Movement Analysis]
+
+	Local : Form : Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Item Movement Analysis]
+
+	Local : Form : Item Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Item Voucher Analysis]
+
+	Local : Form : Item Voucher Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Category Analysis]
+
+	Local : Form : Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Analysis]
+
+	Local : Form : Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ledger Analysis]
+
+	Local : Form : Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Transfer Analysis]
+
+	Local : Form : Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Ageing]
+
+	Local : Form : StockAge : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Journal Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Voucher Register]
+
+	Local : Form : Voucher Register : Add : Part : At End : CmpUserNamePart
+
+[#Report: Physical Stock Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Sales Orders Book]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Purchase Orders Book]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+;;-----------------------------Inventory Statements---------------------------------------------
+[#Report: Godown Summary]
+
+	Local : Form : Godown Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Category Summary]
+
+	Local : Form : Stock Category Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Query]
+
+	Local : Form : Stock Query : Add : Part : At End : CmpUserNamePart
+
+[#Report: BOM Estimate]
+
+	Local : Form : BOM Estimate : Add : Part : At End : CmpUserNamePart
+
+[#Report: Sales Order Summary]
+
+	Local : Form : Stock Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Purchase Order Summary]
+
+	Local : Form : Stock Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: ReOrder Status]
+
+	Local : Form : ReOrder Status : Add : Part : At End : CmpUserNamePart
+
+[#Report: ROItem Movement Analysis]
+
+	Local : Form : Item Movement Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Inward Tracking Details]
+
+	Local : Form : Tracking Details : Add : Part : At End : CmpUserNamePart
+
+[#Report: Item Outward Track]
+
+	Local : Form : Tracking Details : Add : Part : At End : CmpUserNamePart
+
+[#Report: Outward Tracking Details]
+
+	Local : Form : Tracking Details : Add : Part : At End : CmpUserNamePart
+
+[#Report: Statistics]
+
+	Local : Form : Statistics : Add : Part : At End : CmpUserNamePart
+
+;;-----------------------------------Cash/Fund Flow----------------------------------------------
+[#Report: Cash Flow]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Cash Flow BreakUp]
+
+	Local : Form : Cash Flow BreakUp : Add : Part : At End : CmpUserNamePart
+
+[#Report: Funds Flow]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Funds Flow BreakUp]
+
+	Local : Form : Funds Flow BreakUp : Add : Part : At End : CmpUserNamePart
+
+[#Report: List of Accounts]
+
+	Local : Form : List of Accounts : Add : Part : At End : CmpUserNamePart
+
+;;------------------------------Exception Reports-----------------------------------------------
+[#Report: Negative Stock]
+
+	Local : Form : Stock Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Negative Ledgers]
+
+	Local : Form : Group Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Overdue Receivables]
+
+	Local : Form : Bills Outstanding : Add : Part : At End : CmpUserNamePart
+
+[#Report: Overdue Payables]
+
+	Local : Form : Bills Outstanding : Add : Part : At End : CmpUserNamePart
+
+[#Report: Memorandum Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Rev Jrnl Register]
+
+	Local : Form : Monthly Summary : Add : Part : At End : CmpUserNamePart
+
+[#Report: Optional Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Post Dated Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Balance Sheet]
+
+	Local : Form : Balance Sheet : Add : Part : At End : CmpUserNamePart
+
+[#Report: Profit and Loss]
+
+	Local : Form : Profit and Loss : Add : Part : At End : CmpUserNamePart
+
+[#Report: Ratio Analysis]
+
+	Local : Form : Ratio Analysis : Add : Part : At End : CmpUserNamePart
+
+[#Report: Multi Voucher Print]
+
+	Local : Form : Multi Voucher Print : Add : Part : At End : CmpUserNamePart
+
+;;-----------------------------------Multi Acc Printing---------------------------------------
+[#Report: All Ledgers]
+
+	Local : Form : Ledger Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Cash Ledger Vouchers]
+
+	Local : Form : Ledger Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Bank Ledger Vouchers]
+
+	Local : Form : Ledger Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Cash Multi Columnar]
+
+	Local : Form : Cash Multi Columnar : Add : Part : At End : CmpUserNamePart
+
+[#Report: Group Ledger Vouchers]
+
+	Local : Form : Ledger Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Sales Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Purchase Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Journal Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Debit Note Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Credit Note Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Stock Journal Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+[#Report: Physical Stock Vouchers]
+
+	Local : Form : Day Book : Add : Part : At End : CmpUserNamePart
+
+;;-------------------------UserName in Vouchers Printing-------------------------------------------
+
+[#Part: PPR Sign]
+
+	Add : Line : At End : CmpUserNameLine
+
+[#Part: PJR Sign]
+
+	Add : Line : At End : CmpUserNameLine
+
+[#Part: PJR Sign]
+
+	Add : Line : At End : CmpUserNameLine
+
+[#Part: PSV Sign]
+
+	Add : Line : At End : CmpUserNameLine
+
+[#Part: EXPINV Jurisdiction]
+
+	Invisible : No
+	Add : Line : At End : CmpUserNameLine
+
+	[#Line: EXPINV Jurisdiction]
+
+	Invisible : $$IsEmpty:@@Jurisdiction
+
+[#Form: Normal INV Voucher]
+
+	Local : Part : VCH Narration : Add : Line : At End : CmpUserNameLine
+
+;;-------------------------For Payroll Reports and vouchers-------------------------------------------
+; Added for Tally.ERP 9 
+; Modification Date : 15-09-2009
+; Developer : Ratna Bhatt [RND (TDL- PMD)]
+
+[#Report: Attd Print]
+
+	Local : FORM : Voucher: Add : Part : At End : CmpUserNamePart
+
+[#Report: Payslip]
+
+	Local : FORM : Payslip : Add : Part : At End : CmpUserNamePart
+
+[#Report: PaySheet]
+
+	Local : FORM : DSP PaySheet : Add : Part : At End : CmpUserNamePart
+
+[#Report: Payroll Statement]
+
+	Local : FORM : DSP PaySheet : Add : Part : At End : CmpUserNamePart
+
+[#Form: CC Vouchers]
+
+	Add : Part : At End : CmpUserNamePart
+
+[#Report: Payment Advice]
+
+	Local : FORM : Payment Advice	: Add : Part : At End : CmpUserNamePart
+
+[#Report: Payroll Register]
+
+	Local : FORM : Monthly Summary	: Add : Part : At End : CmpUserNamePart
+
+[#Report: Emp Ledger Breakup]
+
+	Local : FORM : Emp Ledger Breakup	: Add : Part : At End : CmpUserNamePart
+
+[#Report: Employee Summary]
+
+	Local : FORM : Employee Summary	: Add : Part : At End : CmpUserNamePart
+
+[#Report: EMP Monthly Summary]
+
+	Local : FORM : Monthly Summary	: Add : Part : At End : CmpUserNamePart
+
+[#Report: Attendance Sheet]
+
+	Local : FORM : Attendance Sheet : Add : Part : At End : CmpUserNamePart
+
+[#Report: Payroll Attd Vouchers]
+
+	Local	:  Form   : Attd Vouchers : Add : Part : At End : CmpUserNamePart
+
+[#Report: Attendance Register]
+
+	Local : FORM : Monthly Summary	: Add : Part : At End : CmpUserNamePart	
+
+[#Report: PassportExpiry]
+
+	Local : FORM : Payroll EmpCatTemplate : Add : Part : At End : CmpUserNamePart	
+
+[#Report: GratuitySummary]
+
+	Local : FORM :  GratuitySummary : Add : Part : At End : CmpUserNamePart	
+
+[#Report: GratuityDetails]
+
+	Local : FORM :  GratuityDetails : Add : Part : At End : CmpUserNamePart	
+
+;;------------------------------------System Formulas--------------------------------------------------
+
+[System: Formula]
+
+	CheckUser 	: $$CmpUserName = 'Tally User'
+	IsCmpUserOn : $IsUserPrintOn:Company:##SVCurrentCompany
+
+[System: UDF]
+
+	IsUserPrintOn : Logical : 10005
+
+;;End of File
