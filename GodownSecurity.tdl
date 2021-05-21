@@ -1,0 +1,98 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+[#Collection: Godown]
+	Add	: Filter	: IsUserGodown
+
+[#Collection: Godown for Parent]
+	Add	: Filter	: IsUserGodown
+
+[#Collection: Multi Godown]
+	Add	: Filter	: IsUserGodown
+
+[#Collection: Godown Under MGodown]
+	Add	: Filter	: IsUserGodown
+
+[#Collection: Stockable Godown]
+	Add	: Filter	: IsUserGodown
+
+[#Collection : Godown Summary]
+	Add	: Filter	: IsUserGodown
+
+[System : Formula]
+	JLGlobalPassFilter		: ($$Name=$$CmpUserName)
+    ReqGodName              : $$FilterCount:JLGodownName:ForThisGodown > 0
+    ForThisGodown           : $JLGodown = $$ReqObject:$Name
+    IsUserGodown            : If $$IsCmpOwner Then 1=1 else $$AsReqObj:$$FilterValue:@@ReqGodName:JLGLUserList:First:JLGlobalPassFilter
+
+[#Collection: Inv Reports]
+    
+[#Collection: Godown Summary]
+	Delete		: Collection
+	Collection	: Primary	: $$IsCmpOwner
+
+[Collection : JL GL User List]
+	Type 		: User List	: Company
+	Childof		: ##SVCurrentCompany
+
+[#Line: CUTitle]
+	Add 	:  Fields  : At End 	: ABN CU Valid Date Title
+	
+	[Field : ABN CU Valid Date Title]
+		Use 		: Short Name Field
+		Set as 		: "Godown"
+
+;[#Line: Company Users]
+;	Add 	:  Fields  : At End 	: ABN CU Valid Date
+
+[#Part: Company Users]
+
+	Local	: Line	: Company Users : Add : Field : At End 	: ABN CU Valid Date
+
+
+	[Field : ABN CU Valid Date]
+		Use 		: Logical Field 
+        Set as      : If $$IsEmpty:#CMPUserName Then "" Else "No"
+        Skip        : $$IsEmpty:#CMPUserName
+        SubForm     : JLGodownForm  : $$Value
+
+
+[Report: JLGodownForm]
+    Form    : JLGodownForm
+
+[Form: JLGodownForm]
+    Part    : JLGodownForm
+    Height  : 50% Screen
+    Width   : 25% Screen
+    
+[Part: JLGodownForm]
+    Line        : JLGodownFormTitle, JLGodownForm
+    Repeat      : JLGodownForm  : JLGodownName
+    Scroll      : Vertical
+    Break on    : $$IsSysName:$JLGodown
+
+[Line: JLGodownFormTitle]
+    Field   : Name Field
+    Border  : Thin Top Bottom
+    Local   : Field : Name Field    : Set as    : "Godown Name"
+    Local   : Field : Name Field    : Full Width: Yes
+    Local   : Field : Name Field    : Align     : Center
+    Local   : Field : Name Field    : Skip      : Yes
+
+[Line: JLGodownForm]
+    Field: JLGodownForm
+
+[Field: JLGodownForm]
+    Use         : Name Field
+    Set as      : $JLGodown
+    Storage     : JLGodown
+    Table       : Godown                : $$Line  = 1
+    Table       : Godown, EndofList     : $$Line  > 1
+    Show Table  : Always
+    Full Width  : Yes
+       
+[System	: UDF]
+    JLGodownName        : Aggregate    : 1
+        JLGodown        : String    : 101
+;;	JLGroupIsCalculable	: String	: 5001
+
+;; Eof
